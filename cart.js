@@ -51,12 +51,14 @@ function getCart($email) {
 
 function deleteItem($id) {
     $.ajax({
-        url: Url + 'DeleteItem',
+        url: Url + 'Cart',
         type: 'delete',
         dataType: 'json',
-        data: {"email":$email},
+        data: JSON.stringify({"product_id": $id, "email": $email}),
         contentType: 'text/plain',
         success: function (data) {
+            getCart($id);
+            alert("Item removed");
 
         },
         error: function (data) {
@@ -66,21 +68,47 @@ function deleteItem($id) {
 }
 
 function checkOut() {
+    let email = $.trim($('#email').val()); //gets the user's email
 
     $.ajax({
-        url: Url + 'CheckOut',
+        url: Url + 'Cart',
         type: 'put',
         dataType: 'json',
-        data: {"email":$email},
+        data: JSON.stringify({"email": email}),
         contentType: 'text/plain',
         success: function (data) {
-
-          
+            getCart($email);
+            alert("Order complete.");
 
         },
         error: function (data) {
             alert("Error while checking out.");
         }
     });
+
+}
+
+function discountBalance(){
+    let totalPrice = 0;
+    let discountPercentage = .10;
+    let newBalance = 0; 
+    $.ajax({
+        url: Url + 'Cart',
+        type: 'post',
+        dataType: 'json',
+        data: JSON.stringify({"email": email}),
+        contentType: 'text/plain',
+        success: function(data){
+            totalPrice += parseInt(item['money_price']);
+            newBalance = totalPrice * discountPercentage;
+            totalPrice = newBalance;
+            getCart();
+        
+    },
+        error: function(data){
+            alert("The special deal of the week has expired.")
+    }
+
+});
 
 }

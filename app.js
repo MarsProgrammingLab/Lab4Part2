@@ -171,33 +171,48 @@ function setComment($id) {
         url: Url+'SetComment',
         type: 'post',
         dataType: 'json',
-        data: {"product_id":$id}, 
+        data: JSON.stringify({"product_id":$id, "comment": $('#Message-text').val(), "score": $('score').val()}), 
         contentType: 'text/plain',
         success: function (data) { //on success
-            
+            $('#exampleModal').modal('hide');
+            fetchComments($id);
+            alert("Your comment has been submitted.")
 
         },
         error: function (data) { //on error, throw an alert
-             alert("Error while setting data")
+            
+             alert("Error while setting comment.")
             }
         });
     
 }
 
 function addToCart($id) {
-    var product;
-    var email = '';
+    var product = $(this).attr("product");
+    var title = $('#title' + product).val();
+    var price = $('#price' + product).val();
+    var quantity = $('#quantity' + product).val();
+    
+    let email = $.trim($('#email').val()); // retrieve user email
 
     $.ajax({
-        url: Url+'AddProduct',
+        url: Url+'AddToCart',
         type: 'POST',
         dataType: 'json',
-        data: {"product_id":$id}, 
+        data: JSON.stringify({
+            product:product,
+            title:title,
+            price:price,
+            quantity:quantity,
+            
+            "product_id": $id, "email": email
+        }), 
         contentType: 'text/plain',
 
         success: function (data) { //on success
-            
-            
+            $('#cart').html(data)
+            sessionStorage.setItem('email', email);
+            alert("Product has been added to cart.")         
 
         },
         error: function (data) { //on error, throw an alert
